@@ -1,4 +1,3 @@
-#Aidan Martin CAP5771 Assignment 4 due 11/23/22
 import os
 import numpy as np
 import pandas as pd
