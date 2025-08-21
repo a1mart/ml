@@ -1,0 +1,305 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ML API",
+    "description": "\n    Machine Learning API\n\n    - Upload datasets\n    - Register and train ML models\n    - Evaluate and rank models\n    - Make predictions\n    - List models and view reports\n    ",
+    "contact": {
+      "name": "AM",
+      "url": "https://github.com/a1mart/ml",
+      "email": "aidan3martin@gmail.com"
+    },
+    "license": { "name": "MIT", "url": "https://opensource.org/licenses/MIT" },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/datasets/upload/": {
+      "post": {
+        "tags": ["Datasets"],
+        "summary": "Upload Dataset",
+        "operationId": "upload_dataset_datasets_upload__post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_dataset_datasets_upload__post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datasets/": {
+      "get": {
+        "tags": ["Datasets"],
+        "summary": "List Datasets",
+        "operationId": "list_datasets_datasets__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    },
+    "/datasets/{dataset_name}": {
+      "get": {
+        "tags": ["Datasets"],
+        "summary": "Get Dataset Info",
+        "operationId": "get_dataset_info_datasets__dataset_name__get",
+        "parameters": [
+          {
+            "name": "dataset_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Dataset Name" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/available": {
+      "get": {
+        "tags": ["Models"],
+        "summary": "Available Models",
+        "description": "Return list of available models and their init parameters",
+        "operationId": "available_models_models_available_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    },
+    "/models/register/{dataset_name}": {
+      "post": {
+        "tags": ["Models"],
+        "summary": "Register Model",
+        "operationId": "register_model_models_register__dataset_name__post",
+        "parameters": [
+          {
+            "name": "dataset_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Dataset Name" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ModelRegister" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/train/{dataset_name}/{model_name}": {
+      "post": {
+        "tags": ["Models"],
+        "summary": "Train Model",
+        "operationId": "train_model_models_train__dataset_name___model_name__post",
+        "parameters": [
+          {
+            "name": "dataset_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Dataset Name" }
+          },
+          {
+            "name": "model_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Model Name" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/list/{dataset_name}": {
+      "get": {
+        "tags": ["Models"],
+        "summary": "List Models",
+        "operationId": "list_models_models_list__dataset_name__get",
+        "parameters": [
+          {
+            "name": "dataset_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Dataset Name" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inference/{dataset_name}": {
+      "post": {
+        "tags": ["Inference"],
+        "summary": "Inference",
+        "operationId": "inference_inference__dataset_name__post",
+        "parameters": [
+          {
+            "name": "dataset_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Dataset Name" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InferenceRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_upload_dataset_datasets_upload__post": {
+        "properties": {
+          "file": { "type": "string", "format": "binary", "title": "File" }
+        },
+        "type": "object",
+        "required": ["file"],
+        "title": "Body_upload_dataset_datasets_upload__post"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "InferenceRequest": {
+        "properties": {
+          "instances": {
+            "items": { "items": { "type": "number" }, "type": "array" },
+            "type": "array",
+            "title": "Instances"
+          },
+          "model_name": { "type": "string", "title": "Model Name" }
+        },
+        "type": "object",
+        "required": ["instances", "model_name"],
+        "title": "InferenceRequest"
+      },
+      "ModelRegister": {
+        "properties": {
+          "name": { "type": "string", "title": "Name" },
+          "model_name": { "type": "string", "title": "Model Name" },
+          "params": {
+            "anyOf": [{ "type": "object" }, { "type": "null" }],
+            "title": "Params",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": ["name", "model_name"],
+        "title": "ModelRegister"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

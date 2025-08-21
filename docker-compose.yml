@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  ml:
+    build: .
+    container_name: ml_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/sets:/app/data/sets
+      - ./data/models:/app/data/models
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  # minio for datastorage
