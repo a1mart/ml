@@ -16,6 +16,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Set up Node.js for auto-changelog
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # Install auto-changelog
+      - name: Install auto-changelog
+        run: npm install -g auto-changelog
+
+      # Generate/update CHANGELOG.md from commit messages
+      - name: Generate CHANGELOG
+        if: github.actor != 'github-actions[bot]'
+        run: |
+          auto-changelog -p
+          
+          # Commit only if there are changes
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add CHANGELOG.md
+          git diff-index --quiet HEAD || git commit -m "ci: update CHANGELOG [skip ci]" && git push
+
       # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -27,27 +49,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      # Generate/update CHANGELOG.md from commit messages
-      - name: Generate CHANGELOG
-        if: github.actor != 'github-actions[bot]'
-        run: |
-          # Install github-changelog-generator
-          gem install github_changelog_generator
-
-          # Generate changelog
-          github_changelog_generator \
-            --user ${{ github.repository_owner }} \
-            --project ${{ github.event.repository.name }} \
-            --output CHANGELOG.md \
-            --future-release "Unreleased" \
-            --since-tag $(git describe --tags --abbrev=0 || echo "")
-
-          # Commit only if there are changes
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add CHANGELOG.md
-          git diff-index --quiet HEAD || git commit -m "ci: update CHANGELOG [skip ci]" && git push
 
       # Build Docker image (for testing)
       - name: Build Docker image
