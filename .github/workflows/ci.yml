@@ -28,6 +28,27 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Generate/update CHANGELOG.md from commit messages
+      - name: Generate CHANGELOG
+        if: github.actor != 'github-actions[bot]'
+        run: |
+          # Install github-changelog-generator
+          gem install github_changelog_generator
+
+          # Generate changelog
+          github_changelog_generator \
+            --user ${{ github.repository_owner }} \
+            --project ${{ github.event.repository.name }} \
+            --output CHANGELOG.md \
+            --future-release "Unreleased" \
+            --since-tag $(git describe --tags --abbrev=0 || echo "")
+
+          # Commit only if there are changes
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add CHANGELOG.md
+          git diff-index --quiet HEAD || git commit -m "ci: update CHANGELOG [skip ci]" && git push
+
       # Build Docker image (for testing)
       - name: Build Docker image
         run: |
@@ -44,7 +65,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: true
+          push: false
           tags: |
             ghcr.io/${{ github.repository_owner }}/ml-fastapi:latest
             ghcr.io/${{ github.repository_owner }}/ml-fastapi:${{ github.sha }}
