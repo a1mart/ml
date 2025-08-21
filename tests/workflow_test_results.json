@@ -1,0 +1,172 @@
+{
+    "dataset_creation": {
+        "status": "success",
+        "details": "Created 603 samples with 30 features. Fraud rate: 9.12%",
+        "timestamp": 1755805360.540245
+    },
+    "dataset_upload": {
+        "status": "success",
+        "details": {
+            "filename": "temp_test_creditcard_3.csv",
+            "original_filename": "temp_test_creditcard.csv",
+            "status": "uploaded",
+            "size_bytes": 329246,
+            "path": "data/sets/temp_test_creditcard_3.csv"
+        },
+        "timestamp": 1755805360.549799
+    },
+    "dataset_info": {
+        "status": "success",
+        "details": {
+            "columns": 30,
+            "rows": 603,
+            "target_suggestions": [
+                "Class"
+            ]
+        },
+        "timestamp": 1755805360.571693
+    },
+    "available_models": {
+        "status": "success",
+        "details": "Found 11 model types",
+        "timestamp": 1755805360.580139
+    },
+    "model_registration": {
+        "status": "success",
+        "details": "Registered 5 models",
+        "timestamp": 1755805360.618571
+    },
+    "training_started": {
+        "status": "success",
+        "details": {
+            "task_id": "a7c7bca9-6ad2-474a-aff3-14b8a48b4965",
+            "poll_url": "/models/tasks/a7c7bca9-6ad2-474a-aff3-14b8a48b4965",
+            "message": "Training started for 5 models"
+        },
+        "timestamp": 1755805360.833355
+    },
+    "training_completed": {
+        "status": "success",
+        "details": {
+            "duration": 4.708343029022217,
+            "results": {
+                "rankings": [
+                    {
+                        "name": "LogisticRegression_L2",
+                        "unique_id": "LogisticRegression_L2_20250821_154241",
+                        "f1_score": 0.8303896103896105,
+                        "std_f1": 0.04637363928617515,
+                        "cv_scores": [
+                            0.8,
+                            0.8571428571428572,
+                            0.9090909090909091,
+                            0.7857142857142858,
+                            0.8
+                        ]
+                    },
+                    {
+                        "name": "LogisticRegression_L1",
+                        "unique_id": "LogisticRegression_L1_20250821_154240",
+                        "f1_score": 0.8262097162097163,
+                        "std_f1": 0.05376032958931317,
+                        "cv_scores": [
+                            0.7500000000000001,
+                            0.8571428571428572,
+                            0.9090909090909091,
+                            0.8148148148148148,
+                            0.8
+                        ]
+                    },
+                    {
+                        "name": "XGBoost_Conservative",
+                        "unique_id": "XGBoost_Conservative_20250821_154244",
+                        "f1_score": 0.6204325674325675,
+                        "std_f1": 0.06471353309337839,
+                        "cv_scores": [
+                            0.5714285714285713,
+                            0.7272727272727273,
+                            0.625,
+                            0.5384615384615385,
+                            0.64
+                        ]
+                    },
+                    {
+                        "name": "RandomForest_Deep",
+                        "unique_id": "RandomForest_Deep_20250821_154243",
+                        "f1_score": 0.5940517961570592,
+                        "std_f1": 0.12095900852035794,
+                        "cv_scores": [
+                            0.6666666666666665,
+                            0.7777777777777778,
+                            0.5333333333333333,
+                            0.4210526315789474,
+                            0.5714285714285713
+                        ]
+                    },
+                    {
+                        "name": "RandomForest_Shallow",
+                        "unique_id": "RandomForest_Shallow_20250821_154241",
+                        "f1_score": 0.5157360793287566,
+                        "std_f1": 0.12292471204543519,
+                        "cv_scores": [
+                            0.39999999999999997,
+                            0.6956521739130435,
+                            0.631578947368421,
+                            0.43478260869565216,
+                            0.41666666666666663
+                        ]
+                    }
+                ],
+                "models_trained": 5,
+                "saved_models": [
+                    {
+                        "unique_id": "LogisticRegression_L2_20250821_154241",
+                        "file_path": "data/models/temp_test_creditcard_3.csv/LogisticRegression_L2_20250821_154241.pkl",
+                        "report_available": true,
+                        "model_name": "LogisticRegression_L2",
+                        "mean_f1": 0.8303896103896105,
+                        "timestamp": "2025-08-21T15:42:41.027256"
+                    },
+                    {
+                        "unique_id": "LogisticRegression_L1_20250821_154240",
+                        "file_path": "data/models/temp_test_creditcard_3.csv/LogisticRegression_L1_20250821_154240.pkl",
+                        "report_available": true,
+                        "model_name": "LogisticRegression_L1",
+                        "mean_f1": 0.8262097162097163,
+                        "timestamp": "2025-08-21T15:42:40.831028"
+                    },
+                    {
+                        "unique_id": "XGBoost_Conservative_20250821_154244",
+                        "file_path": "data/models/temp_test_creditcard_3.csv/XGBoost_Conservative_20250821_154244.pkl",
+                        "report_available": true,
+                        "model_name": "XGBoost_Conservative",
+                        "mean_f1": 0.6204325674325675,
+                        "timestamp": "2025-08-21T15:42:44.981214"
+                    },
+                    {
+                        "unique_id": "RandomForest_Deep_20250821_154243",
+                        "file_path": "data/models/temp_test_creditcard_3.csv/RandomForest_Deep_20250821_154243.pkl",
+                        "report_available": true,
+                        "model_name": "RandomForest_Deep",
+                        "mean_f1": 0.5940517961570592,
+                        "timestamp": "2025-08-21T15:42:43.527118"
+                    },
+                    {
+                        "unique_id": "RandomForest_Shallow_20250821_154241",
+                        "file_path": "data/models/temp_test_creditcard_3.csv/RandomForest_Shallow_20250821_154241.pkl",
+                        "report_available": true,
+                        "model_name": "RandomForest_Shallow",
+                        "mean_f1": 0.5157360793287566,
+                        "timestamp": "2025-08-21T15:42:41.974730"
+                    }
+                ]
+            }
+        },
+        "timestamp": 1755805365.542005
+    },
+    "list_models": {
+        "status": "success",
+        "details": "Found 0 trained models",
+        "timestamp": 1755805365.5767791
+    }
+}

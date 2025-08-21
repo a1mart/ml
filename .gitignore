@@ -1,6 +1,8 @@
 .DS_Store
 data/models/*
 data/sets/creditcard.csv
+data/sets/temp_test_*
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

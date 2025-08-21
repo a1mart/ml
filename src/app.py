@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.routes import datasets, models, inferences
+from src.routes import datasets, models, inferences, health
 
 app = FastAPI(title="ML API",
     description="""
@@ -29,3 +29,4 @@ app = FastAPI(title="ML API",
 app.include_router(datasets.router)
 app.include_router(models.router)
 app.include_router(inferences.router)
+app.include_router(health.router)

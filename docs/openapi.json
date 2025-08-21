@@ -16,6 +16,7 @@
       "post": {
         "tags": ["Datasets"],
         "summary": "Upload Dataset",
+        "description": "Upload a dataset file",
         "operationId": "upload_dataset_datasets_upload__post",
         "requestBody": {
           "content": {
@@ -30,7 +31,14 @@
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Upload Dataset Datasets Upload  Post"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -47,11 +55,19 @@
       "get": {
         "tags": ["Datasets"],
         "summary": "List Datasets",
+        "description": "List all uploaded datasets",
         "operationId": "list_datasets_datasets__get",
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response List Datasets Datasets  Get"
+                }
+              }
+            }
           }
         }
       }
@@ -60,7 +76,40 @@
       "get": {
         "tags": ["Datasets"],
         "summary": "Get Dataset Info",
+        "description": "Get detailed information about a dataset",
         "operationId": "get_dataset_info_datasets__dataset_name__get",
+        "parameters": [
+          {
+            "name": "dataset_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Dataset Name" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DatasetInfo" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Datasets"],
+        "summary": "Delete Dataset",
+        "description": "Delete a dataset",
+        "operationId": "delete_dataset_datasets__dataset_name__delete",
         "parameters": [
           {
             "name": "dataset_name",
@@ -103,6 +152,7 @@
       "post": {
         "tags": ["Models"],
         "summary": "Register Model",
+        "description": "Register a model for a specific dataset",
         "operationId": "register_model_models_register__dataset_name__post",
         "parameters": [
           {
@@ -136,29 +186,70 @@
         }
       }
     },
-    "/models/train/{dataset_name}/{model_name}": {
+    "/models/train/{dataset_name}": {
       "post": {
         "tags": ["Models"],
-        "summary": "Train Model",
-        "operationId": "train_model_models_train__dataset_name___model_name__post",
+        "summary": "Train Models",
+        "description": "FIXED: Start training models asynchronously with unified request structure",
+        "operationId": "train_models_models_train__dataset_name__post",
         "parameters": [
           {
             "name": "dataset_name",
             "in": "path",
             "required": true,
             "schema": { "type": "string", "title": "Dataset Name" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TrainingRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TrainingResponse" }
+              }
+            }
           },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/tasks/{task_id}": {
+      "get": {
+        "tags": ["Models"],
+        "summary": "Get Task Status",
+        "description": "Get the status of a training task",
+        "operationId": "get_task_status_models_tasks__task_id__get",
+        "parameters": [
           {
-            "name": "model_name",
+            "name": "task_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "title": "Model Name" }
+            "schema": { "type": "string", "title": "Task Id" }
           }
         ],
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TaskStatus" }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -175,6 +266,7 @@
       "get": {
         "tags": ["Models"],
         "summary": "List Models",
+        "description": "List all models (registered and trained) for a dataset",
         "operationId": "list_models_models_list__dataset_name__get",
         "parameters": [
           {
@@ -200,26 +292,55 @@
         }
       }
     },
-    "/inference/{dataset_name}": {
-      "post": {
-        "tags": ["Inference"],
-        "summary": "Inference",
-        "operationId": "inference_inference__dataset_name__post",
+    "/models/trained/{dataset_name}/{model_id}": {
+      "delete": {
+        "tags": ["Models"],
+        "summary": "Delete Trained Model",
+        "description": "Delete a trained model",
+        "operationId": "delete_trained_model_models_trained__dataset_name___model_id__delete",
         "parameters": [
           {
             "name": "dataset_name",
             "in": "path",
             "required": true,
             "schema": { "type": "string", "title": "Dataset Name" }
+          },
+          {
+            "name": "model_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Model Id" }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/InferenceRequest" }
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
             }
           }
+        }
+      }
+    },
+    "/testing/complete-workflow": {
+      "post": {
+        "tags": ["Testing Workflow"],
+        "summary": "Test Complete Workflow",
+        "description": "Test the complete ML workflow from dataset creation to inference",
+        "operationId": "test_complete_workflow_testing_complete_workflow_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/WorkflowTest" }
+            }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -236,6 +357,49 @@
           }
         }
       }
+    },
+    "/testing/cleanup/{dataset_name}": {
+      "get": {
+        "tags": ["Testing Workflow"],
+        "summary": "Cleanup Test Data",
+        "description": "Clean up test data and models",
+        "operationId": "cleanup_test_data_testing_cleanup__dataset_name__get",
+        "parameters": [
+          {
+            "name": "dataset_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Dataset Name" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health Check",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -248,6 +412,34 @@
         "required": ["file"],
         "title": "Body_upload_dataset_datasets_upload__post"
       },
+      "DatasetInfo": {
+        "properties": {
+          "filename": { "type": "string", "title": "Filename" },
+          "columns": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Columns"
+          },
+          "rows": { "type": "integer", "title": "Rows" },
+          "size_bytes": { "type": "integer", "title": "Size Bytes" },
+          "file_type": { "type": "string", "title": "File Type" },
+          "target_suggestions": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Target Suggestions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "filename",
+          "columns",
+          "rows",
+          "size_bytes",
+          "file_type",
+          "target_suggestions"
+        ],
+        "title": "DatasetInfo"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -259,19 +451,6 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
-      "InferenceRequest": {
-        "properties": {
-          "instances": {
-            "items": { "items": { "type": "number" }, "type": "array" },
-            "type": "array",
-            "title": "Instances"
-          },
-          "model_name": { "type": "string", "title": "Model Name" }
-        },
-        "type": "object",
-        "required": ["instances", "model_name"],
-        "title": "InferenceRequest"
-      },
       "ModelRegister": {
         "properties": {
           "name": { "type": "string", "title": "Name" },
@@ -280,11 +459,92 @@
             "anyOf": [{ "type": "object" }, { "type": "null" }],
             "title": "Params",
             "default": {}
+          },
+          "target_column": { "type": "string", "title": "Target Column" },
+          "drop_columns": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Drop Columns",
+            "default": []
           }
         },
         "type": "object",
-        "required": ["name", "model_name"],
+        "required": ["name", "model_name", "target_column"],
         "title": "ModelRegister"
+      },
+      "TaskStatus": {
+        "properties": {
+          "task_id": { "type": "string", "title": "Task Id" },
+          "status": { "type": "string", "title": "Status" },
+          "progress": { "type": "number", "title": "Progress" },
+          "start_time": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Start Time"
+          },
+          "end_time": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "End Time"
+          },
+          "error_message": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Error Message"
+          },
+          "results": {
+            "anyOf": [{ "type": "object" }, { "type": "null" }],
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": ["task_id", "status", "progress"],
+        "title": "TaskStatus"
+      },
+      "TrainingRequest": {
+        "properties": {
+          "target_column": { "type": "string", "title": "Target Column" },
+          "drop_columns": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Drop Columns",
+            "default": []
+          },
+          "n_splits": { "type": "integer", "title": "N Splits", "default": 5 },
+          "random_state": {
+            "type": "integer",
+            "title": "Random State",
+            "default": 1
+          },
+          "save_format": {
+            "type": "string",
+            "title": "Save Format",
+            "default": "pkl"
+          },
+          "model_ids": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Model Ids"
+          }
+        },
+        "type": "object",
+        "required": ["target_column"],
+        "title": "TrainingRequest",
+        "description": "FIXED: Combined training request model"
+      },
+      "TrainingResponse": {
+        "properties": {
+          "task_id": { "type": "string", "title": "Task Id" },
+          "status": { "type": "string", "title": "Status" },
+          "message": { "type": "string", "title": "Message" },
+          "poll_url": { "type": "string", "title": "Poll Url" }
+        },
+        "type": "object",
+        "required": ["task_id", "status", "message", "poll_url"],
+        "title": "TrainingResponse"
       },
       "ValidationError": {
         "properties": {
@@ -299,6 +559,38 @@
         "type": "object",
         "required": ["loc", "msg", "type"],
         "title": "ValidationError"
+      },
+      "WorkflowTest": {
+        "properties": {
+          "dataset_name": {
+            "type": "string",
+            "title": "Dataset Name",
+            "default": "test_dataset"
+          },
+          "n_samples": {
+            "type": "integer",
+            "title": "N Samples",
+            "default": 1000
+          },
+          "n_features": {
+            "type": "integer",
+            "title": "N Features",
+            "default": 20
+          },
+          "n_classes": {
+            "type": "integer",
+            "title": "N Classes",
+            "default": 2
+          },
+          "models_to_test": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Models To Test",
+            "default": ["LogisticRegression", "RandomForest", "XGBoost"]
+          }
+        },
+        "type": "object",
+        "title": "WorkflowTest"
       }
     }
   }
