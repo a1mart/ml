@@ -16,23 +16,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Set up Node.js for auto-changelog
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      # Set up Python
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          node-version: 20
+          python-version: 3.11
 
-      # Install auto-changelog
-      - name: Install auto-changelog
-        run: npm install -g auto-changelog
+      # Install git-changelog
+      - name: Install git-changelog
+        run: pip install git-changelog
 
-      # Generate/update CHANGELOG.md from commit messages
+      # Generate/update CHANGELOG.md
       - name: Generate CHANGELOG
         if: github.actor != 'github-actions[bot]'
         run: |
-          auto-changelog -p
+          git-changelog --output CHANGELOG.md --unreleased
           
-          # Commit only if there are changes
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add CHANGELOG.md
