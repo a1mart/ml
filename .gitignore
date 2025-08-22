@@ -2,7 +2,7 @@
 data/models/*
 data/sets/creditcard.csv
 data/sets/temp_test_*
-
+src/_/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

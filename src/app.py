@@ -29,4 +29,4 @@ app = FastAPI(title="ML API",
 app.include_router(datasets.router)
 app.include_router(models.router)
 app.include_router(inferences.router)
-app.include_router(health.router)
+app.include_router(health.router) 

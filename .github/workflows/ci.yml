@@ -16,28 +16,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Set up Python
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
+    #   # Set up Python
+    #   - name: Setup Python
+    #     uses: actions/setup-python@v4
+    #     with:
+    #       python-version: 3.11
 
-      # Install git-changelog
-      - name: Install git-changelog
-        run: pip install git-changelog
+    #   # Install git-changelog
+    #   - name: Install git-changelog
+    #     run: pip install git-changelog
 
-      - name: Generate/update CHANGELOG.md
-        if: github.actor != 'github-actions[bot]'
-        run: |
-          # Generate changelog since last tag
-          LAST_TAG=$(git describe --tags --abbrev=0 || echo "")
-          git-changelog --output CHANGELOG.md --range "$LAST_TAG..HEAD"
+    #   - name: Generate/update CHANGELOG.md
+    #     if: github.actor != 'github-actions[bot]'
+    #     run: |
+    #       # Generate changelog since last tag
+    #       LAST_TAG=$(git describe --tags --abbrev=0 || echo "")
+    #       git-changelog --output CHANGELOG.md --range "$LAST_TAG..HEAD"
           
-          # Commit only if there are changes
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add CHANGELOG.md
-          git diff-index --quiet HEAD || git commit -m "ci: update CHANGELOG [skip ci]" && git push      
+    #       # Commit only if there are changes
+    #       git config user.name "github-actions"
+    #       git config user.email "github-actions@github.com"
+    #       git add CHANGELOG.md
+    #       git diff-index --quiet HEAD || git commit -m "ci: update CHANGELOG [skip ci]" && git push      
 
       # Set up Docker Buildx
       - name: Set up Docker Buildx

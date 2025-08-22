@@ -1,3 +1,4 @@
+import io
 import os
 import pickle
 import joblib
@@ -38,6 +39,9 @@ try:
     CATBOOST_AVAILABLE = True
 except ImportError:
     CATBOOST_AVAILABLE = False
+
+from src.deps.storage import get_storage
+from src.storage.base import BaseStorage
 
 class TrainingStatus(Enum):
     PENDING = "pending"
@@ -80,8 +84,8 @@ class MLManager:
 
     SUPPORTED_FORMATS = ["pkl", "joblib", "onnx", "json"]
 
-    def __init__(self, dataset_path, target_column, drop_columns=None, random_state=1, n_splits=5,
-                 save_dir="data/models", save_format="pkl", dataset_name=None):
+    def __init__(self, dataset_path, target_column, storage: BaseStorage=None, drop_columns=None, random_state=1, n_splits=5,
+                 save_format="pkl", dataset_name=None):
         self.dataset_path = dataset_path
         self.target_column = target_column
         self.drop_columns = drop_columns or []
@@ -89,41 +93,63 @@ class MLManager:
         self.n_splits = n_splits
         self.save_format = save_format.lower()
         self.dataset_name = dataset_name or os.path.basename(dataset_path).split('.')[0]
+        self.storage = storage or get_storage()
         
         # Create unique model directory for this dataset
-        self.save_dir = os.path.join(save_dir, self.dataset_name)
+        # self.save_dir = os.path.join(save_dir, self.dataset_name)
         
         if self.save_format not in self.SUPPORTED_FORMATS:
             raise ValueError(f"Unsupported save_format: {self.save_format}. Supported: {self.SUPPORTED_FORMATS}")
-        os.makedirs(self.save_dir, exist_ok=True)
+        #os.makedirs(self.save_dir, exist_ok=True)
 
         self.models = {}
         self.results = []
         self._load_dataset()
 
     def _load_dataset(self):
-        """Load and preprocess the dataset"""
+        """Load and preprocess the dataset using storage abstraction"""
         try:
+            file_bytes = self.storage.get_file(self.dataset_path)
             if self.dataset_path.endswith('.csv'):
-                data = pd.read_csv(self.dataset_path)
+                data = pd.read_csv(io.BytesIO(file_bytes))
             elif self.dataset_path.endswith('.json'):
-                data = pd.read_json(self.dataset_path)
+                data = pd.read_json(io.BytesIO(file_bytes))
             else:
                 raise ValueError("Unsupported file format. Use CSV or JSON.")
             
             if self.drop_columns:
                 data = data.drop(columns=[c for c in self.drop_columns if c in data.columns])
             data = data.drop_duplicates()
-            
-            # Handle missing values
             data = data.dropna()
-            
+
             self.X = data.drop(columns=[self.target_column]).values
             self.y = data[self.target_column].values
             self.feature_names = list(data.drop(columns=[self.target_column]).columns)
-            
+
         except Exception as e:
             raise ValueError(f"Error loading dataset: {str(e)}")
+            """Load and preprocess the dataset"""
+            try:
+                if self.dataset_path.endswith('.csv'):
+                    data = pd.read_csv(self.dataset_path)
+                elif self.dataset_path.endswith('.json'):
+                    data = pd.read_json(self.dataset_path)
+                else:
+                    raise ValueError("Unsupported file format. Use CSV or JSON.")
+                
+                if self.drop_columns:
+                    data = data.drop(columns=[c for c in self.drop_columns if c in data.columns])
+                data = data.drop_duplicates()
+                
+                # Handle missing values
+                data = data.dropna()
+                
+                self.X = data.drop(columns=[self.target_column]).values
+                self.y = data[self.target_column].values
+                self.feature_names = list(data.drop(columns=[self.target_column]).columns)
+                
+            except Exception as e:
+                raise ValueError(f"Error loading dataset: {str(e)}")
 
     def register_model(self, name, model_name, **params):
         """Register a model with specific parameters"""
@@ -150,21 +176,21 @@ class MLManager:
         ])
 
     def _generate_model_path(self, name):
-        """Generate unique model file path"""
+        """Generate unique model file path including dataset folder"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         unique_name = f"{name}_{timestamp}"
-        return unique_name
+        folder = f"models/{self.dataset_name}"
+        full_path = f"{folder}/{unique_name}"
+        return full_path
 
     def _save_model_and_report(self, pipeline, name, report_dict):
-        """Save model and report with proper naming"""
-        unique_name = self._generate_model_path(name)
-        model_path = os.path.join(self.save_dir, f"{unique_name}.{self.save_format}")
-        report_path = os.path.join(self.save_dir, f"{unique_name}_report.json")
+        unique_path = self._generate_model_path(name)
+        model_file = f"{unique_path}.{self.save_format}"
+        report_file = f"{unique_path}_report.json"
 
-        # Enhanced report with metadata
         enhanced_report = {
             "model_name": name,
-            "unique_id": unique_name,
+            "unique_id": os.path.basename(unique_path),
             "dataset_name": self.dataset_name,
             "timestamp": datetime.now().isoformat(),
             "save_format": self.save_format,
@@ -175,27 +201,27 @@ class MLManager:
             **report_dict
         }
 
-        try:
-            # Save model
+        # Save model
+        if self.save_format in ["pkl", "joblib"]:
+            buffer = io.BytesIO()
             if self.save_format == "pkl":
-                with open(model_path, "wb") as f:
-                    pickle.dump(pipeline, f)
-            elif self.save_format == "joblib":
-                joblib.dump(pipeline, model_path)
-            elif self.save_format == "onnx":
-                initial_type = [('float_input', FloatTensorType([None, self.X.shape[1]]))]
-                onnx_model = convert_sklearn(pipeline, initial_types=initial_type)
-                with open(model_path, "wb") as f:
-                    f.write(onnx_model.SerializeToString())
+                pickle.dump(pipeline, buffer)
+            else:
+                joblib.dump(pipeline, buffer)
+            buffer.seek(0)
+            self.storage.save_file(model_file, buffer.getvalue())
+        elif self.save_format == "onnx":
+            from skl2onnx import convert_sklearn
+            from skl2onnx.common.data_types import FloatTensorType
+            initial_type = [('float_input', FloatTensorType([None, self.X.shape[1]]))]
+            onnx_model = convert_sklearn(pipeline, initial_types=initial_type)
+            self.storage.save_file(model_file, onnx_model.SerializeToString())
 
-            # Save enhanced report as JSON
-            with open(report_path, "w") as f:
-                json.dump(enhanced_report, f, indent=4)
-                
-            return unique_name
-            
-        except Exception as e:
-            raise RuntimeError(f"Error saving model: {str(e)}")
+        # Save JSON report
+        report_bytes = json.dumps(enhanced_report, indent=4).encode('utf-8')
+        self.storage.save_file(report_file, report_bytes)
+
+        return os.path.basename(unique_path)
 
     def _cross_val_score_pipeline(self, name, estimator, progress_callback=None):
         """Cross-validation with progress tracking"""
@@ -290,49 +316,35 @@ class MLManager:
         return top_score, top_name, top_pipe, report, unique_id
 
     def load_model(self, unique_name):
-        """Load a saved model by its unique name"""
-        model_path = os.path.join(self.save_dir, f"{unique_name}.{self.save_format}")
-        if not os.path.exists(model_path):
-            raise FileNotFoundError(f"No saved model found for '{unique_name}'")
-        
+        model_file = f"{unique_name}.{self.save_format}"
+        data = self.storage.get_file(model_file)
+
         if self.save_format == "pkl":
-            with open(model_path, "rb") as f:
-                return pickle.load(f)
+            import io, pickle
+            return pickle.load(io.BytesIO(data))
         elif self.save_format == "joblib":
-            return joblib.load(model_path)
+            import io, joblib
+            return joblib.load(io.BytesIO(data))
         elif self.save_format == "onnx":
-            with open(model_path, "rb") as f:
-                return f.read()  # Returns ONNX binary
+            return data  # ONNX bytes
 
     def list_saved_models(self):
-        """List all saved models for this dataset"""
+        files = self.storage.list_files()
         models = []
-        if not os.path.exists(self.save_dir):
-            return models
-            
-        for file in os.listdir(self.save_dir):
-            if file.endswith(f".{self.save_format}"):
-                model_name = file.replace(f".{self.save_format}", "")
-                report_path = os.path.join(self.save_dir, f"{model_name}_report.json")
-                
-                model_info = {
+        for f in files:
+            if f.endswith(f".{self.save_format}"):
+                model_name = f.replace(f".{self.save_format}", "")
+                report_file = f"{model_name}_report.json"
+                report_data = {}
+                if self.storage.file_exists(report_file):
+                    report_json = self.storage.get_file(report_file) 
+                    report_data = json.loads(report_json.decode('utf-8'))  # decode bytes
+                models.append({
                     "unique_id": model_name,
-                    "file_path": os.path.join(self.save_dir, file),
-                    "report_available": os.path.exists(report_path)
-                }
-                
-                if model_info["report_available"]:
-                    with open(report_path, "r") as f:
-                        report = json.load(f)
-                        model_info.update({
-                            "model_name": report.get("model_name", "Unknown"),
-                            "mean_f1": report.get("mean_f1", 0),
-                            "timestamp": report.get("timestamp", "Unknown")
-                        })
-                
-                models.append(model_info)
-        
-        # Sort by F1 score descending
+                    "model_name": report_data.get("model_name", "Unknown"),
+                    "mean_f1": report_data.get("mean_f1", 0),
+                    "timestamp": report_data.get("timestamp", "Unknown")
+                })
         return sorted(models, key=lambda x: x.get("mean_f1", 0), reverse=True)
 
 # Task Management for Async Training
@@ -389,11 +401,13 @@ task_manager = TaskManager()
 # -------------------------
 if __name__ == "__main__":
     # Example with credit card fraud dataset
+    storage = get_storage()
     manager = MLManager(
-        dataset_path="data/sets/creditcard.csv", 
-        target_column="Class", 
+        dataset_path="data/sets/creditcard.csv",
+        target_column="Class",
         drop_columns=["Time"],
-        dataset_name="creditcard_fraud"
+        dataset_name="creditcard_fraud",
+        storage=storage
     )
 
     # Register multiple models with different configurations

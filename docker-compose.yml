@@ -11,5 +11,26 @@ services:
       - ./data/models:/app/data/models
     environment:
       - PYTHONUNBUFFERED=1
+      
+      - STORAGE_BACKEND="s3"
+      - S3_BUCKET="ml-bucket"
+      - AWS_ENDPOINT="http://localhost:9000"
+      - AWS_ACCESS_KEY_ID="admin"
+      - AWS_SECRET_ACCESS_KEY="strongpassword"
+      - AWS_REGION="eastus"
 
-  # minio for datastorage
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: strongpassword
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+volumes:
+  minio_data:
