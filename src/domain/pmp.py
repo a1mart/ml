@@ -21,12 +21,20 @@ from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
 
 # Available ML models
-from sklearn.linear_model import LogisticRegression, Ridge, Lasso
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression, Ridge, Lasso, ElasticNet, PassiveAggressiveClassifier
+from sklearn.neighbors import KNeighborsClassifier, RadiusNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
-from sklearn.svm import SVC
-from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import (
+    RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier,
+    ExtraTreesClassifier, BaggingClassifier, VotingClassifier, StackingClassifier, HistGradientBoostingClassifier
+)
+from sklearn.svm import SVC, LinearSVC, NuSVC, OneClassSVM
+from sklearn.naive_bayes import GaussianNB, BernoulliNB, MultinomialNB, ComplementNB
+from sklearn.neural_network import MLPClassifier
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import LocalOutlierFactor
+
 from xgboost import XGBClassifier
 try:
     from lightgbm import LGBMClassifier
@@ -40,6 +48,19 @@ try:
 except ImportError:
     CATBOOST_AVAILABLE = False
 
+try:
+    from pytorch_tabnet.tab_model import TabNetClassifier
+    TABNET_AVAILABLE = True
+except ImportError:
+    TABNET_AVAILABLE = False
+
+try:
+    from ngboost import NGBClassifier
+    NGBOOST_AVAILABLE = True
+except ImportError:
+    NGBOOST_AVAILABLE = False
+
+# Custom modules
 from src.deps.storage import get_storage
 from src.storage.base import BaseStorage
 
@@ -66,21 +87,42 @@ class MLManager:
         "LogisticRegression": LogisticRegression,
         "Ridge": Ridge,
         "Lasso": Lasso,
+        "ElasticNet": ElasticNet,
+        "PassiveAggressiveClassifier": PassiveAggressiveClassifier,
         "KNN": KNeighborsClassifier,
+        "RadiusNeighborsClassifier": RadiusNeighborsClassifier,
         "DecisionTree": DecisionTreeClassifier,
         "RandomForest": RandomForestClassifier,
+        "ExtraTrees": ExtraTreesClassifier,
         "GradientBoosting": GradientBoostingClassifier,
+        "HistGradientBoosting": HistGradientBoostingClassifier,
         "AdaBoost": AdaBoostClassifier,
+        "Bagging": BaggingClassifier,
+        "Voting": VotingClassifier,
+        "Stacking": StackingClassifier,
         "SVC": SVC,
+        "LinearSVC": LinearSVC,
+        "NuSVC": NuSVC,
         "GaussianNB": GaussianNB,
+        "BernoulliNB": BernoulliNB,
+        "MultinomialNB": MultinomialNB,
+        "ComplementNB": ComplementNB,
+        "MLPClassifier": MLPClassifier,
+        "GaussianProcess": GaussianProcessClassifier,
+        "IsolationForest": IsolationForest,
+        "LocalOutlierFactor": LocalOutlierFactor,
+        "OneClassSVM": OneClassSVM,
         "XGBoost": XGBClassifier,
     }
-    
+
     if LIGHTGBM_AVAILABLE:
         AVAILABLE_MODELS["LightGBM"] = LGBMClassifier
-    
     if CATBOOST_AVAILABLE:
         AVAILABLE_MODELS["CatBoost"] = CatBoostClassifier
+    if TABNET_AVAILABLE:
+        AVAILABLE_MODELS["TabNet"] = TabNetClassifier
+    if NGBOOST_AVAILABLE:
+        AVAILABLE_MODELS["NGBoost"] = NGBClassifier
 
     SUPPORTED_FORMATS = ["pkl", "joblib", "onnx", "json"]
 

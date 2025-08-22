@@ -20,21 +20,41 @@ Supports common ML models, cross-validation, model ranking, and saving models in
 
 ## Supported Models
 
-| Model | Library | Description |
-|-------|---------|-------------|
-| LogisticRegression | scikit-learn | Linear classifier with regularization options |
-| Ridge | scikit-learn | Ridge regression for continuous targets |
-| Lasso | scikit-learn | Lasso regression with L1 regularization |
-| KNN | scikit-learn | K-Nearest Neighbors classifier |
-| DecisionTree | scikit-learn | Single decision tree classifier |
-| RandomForest | scikit-learn | Ensemble of decision trees |
-| GradientBoosting | scikit-learn | Gradient boosting classifier |
-| AdaBoost | scikit-learn | Adaptive boosting classifier |
-| SVC | scikit-learn | Support Vector Classifier |
-| GaussianNB | scikit-learn | Gaussian Naive Bayes |
-| XGBoost | xgboost | Extreme gradient boosting |
-| LightGBM | lightgbm | Microsoft's gradient boosting (optional) |
-| CatBoost | catboost | Yandex's gradient boosting (optional) |
+| Model                       | Library        | Description                                       | Optional |
+| --------------------------- | -------------- | ------------------------------------------------- | -------- |
+| LogisticRegression          | scikit-learn   | Linear classifier with regularization options     | No       |
+| Ridge                       | scikit-learn   | Ridge regression for continuous targets           | No       |
+| Lasso                       | scikit-learn   | Lasso regression with L1 regularization           | No       |
+| ElasticNet                  | scikit-learn   | Linear regression with L1+L2 regularization       | No       |
+| PassiveAggressiveClassifier | scikit-learn   | Online linear classifier for large-scale learning | No       |
+| KNN                         | scikit-learn   | K-Nearest Neighbors classifier                    | No       |
+| RadiusNeighborsClassifier   | scikit-learn   | Classifier using neighbors within a fixed radius  | No       |
+| DecisionTree                | scikit-learn   | Single decision tree classifier                   | No       |
+| RandomForest                | scikit-learn   | Ensemble of decision trees                        | No       |
+| ExtraTrees                  | scikit-learn   | Randomized ensemble of trees                      | No       |
+| GradientBoosting            | scikit-learn   | Gradient boosting classifier                      | No       |
+| HistGradientBoosting        | scikit-learn   | Faster gradient boosting (histogram-based)        | No       |
+| AdaBoost                    | scikit-learn   | Adaptive boosting classifier                      | No       |
+| SVC                         | scikit-learn   | Support Vector Classifier                         | No       |
+| LinearSVC                   | scikit-learn   | Linear SVM                                        | No       |
+| NuSVC                       | scikit-learn   | SVM variant with error fraction control           | No       |
+| GaussianNB                  | scikit-learn   | Gaussian Naive Bayes                              | No       |
+| BernoulliNB                 | scikit-learn   | Bernoulli Naive Bayes                             | No       |
+| MultinomialNB               | scikit-learn   | Multinomial Naive Bayes                           | No       |
+| ComplementNB                | scikit-learn   | Complement Naive Bayes                            | No       |
+| MLPClassifier               | scikit-learn   | Feedforward neural network                        | No       |
+| XGBoost                     | xgboost        | Extreme gradient boosting                         | Optional |
+| LightGBM                    | lightgbm       | Microsoft gradient boosting                       | Optional |
+| CatBoost                    | catboost       | Yandex gradient boosting                          | Optional |
+| TabNet                      | pytorch-tabnet | Deep learning model for tabular data              | Optional |
+| GaussianProcessClassifier   | scikit-learn   | Kernel-based probabilistic classifier             | No       |
+| IsolationForest             | scikit-learn   | Tree-based anomaly detection                      | No       |
+| LocalOutlierFactor          | scikit-learn   | Local anomaly detection                           | No       |
+| OneClassSVM                 | scikit-learn   | Anomaly detection SVM                             | No       |
+| BaggingClassifier           | scikit-learn   | Generic bagging ensemble wrapper                  | No       |
+| VotingClassifier            | scikit-learn   | Combines multiple models (hard/soft voting)       | No       |
+| StackingClassifier          | scikit-learn   | Stacked ensemble of multiple base learners        | No       |
+| NGBoost                     | ngboost        | Probabilistic gradient boosting                   | Optional |
 
 ---
 
